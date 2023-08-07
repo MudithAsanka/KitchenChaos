@@ -7,10 +7,49 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private GameInput gameInput;
+    [SerializeField] private LayerMask countersLayerMask;
 
     private bool isWalking;
+    private Vector3 lastInteractDir;
 
     private void Update()
+    {
+        HandleMovement();
+        HandleInteractions();
+    }
+
+    // Returns player is moving or not
+    public bool IsWalking()
+    {
+        return isWalking;
+    }
+
+    // Handle the player interactions
+    private void HandleInteractions()
+    {
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        // When stop moving moveDir become Vector3.zero and Raycast nowhere,
+        // So lastInteractDir need to save otherwise no change the direction
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+
+        float interactDistance = 2f;
+        if(Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
+        {
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter)){
+                // Has Clear counter component | TryGetComponent handles null check
+                clearCounter.Interact();
+            }
+        }
+    }
+
+    // Handle the player movements
+    private void HandleMovement()
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
 
@@ -65,11 +104,5 @@ public class Player : MonoBehaviour
         float rotateSpeed = 10f;
         transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
 
-    }
-
-    // Returns player is moving or not
-    public bool IsWalking()
-    {
-        return isWalking;
     }
 }
