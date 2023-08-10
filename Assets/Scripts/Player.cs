@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -5,12 +6,35 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
+    public static Player Instance { get; private set; }     // This is a property; only set in this class, can acesess from any class
+
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public ClearCounter selectedCounter; 
+    }
+
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask countersLayerMask;
 
     private bool isWalking;
     private Vector3 lastInteractDir;
+    private ClearCounter selectedCounter;
+
+    private void Awake()
+    {
+        /* Singleton pattern has only one instance of something.
+         * In this case we should never have that more than one player
+         * So, do safety check by checking is this instance already set to one instance
+        */
+        if(Instance != null)
+        {
+            Debug.LogError("There are more than one Player instance");
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -19,25 +43,9 @@ public class Player : MonoBehaviour
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
-
-        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
-
-        // When stop moving moveDir become Vector3.zero and Raycast nowhere,
-        // So lastInteractDir need to save otherwise no change the direction
-        if (moveDir != Vector3.zero)
+        if(selectedCounter != null)
         {
-            lastInteractDir = moveDir;
-        }
-
-        float interactDistance = 2f;
-        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
-        {
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
-            {
-                // Has Clear counter component | TryGetComponent handles null check
-                clearCounter.Interact();
-            }
+            selectedCounter.Interact();
         }
     }
 
@@ -72,9 +80,22 @@ public class Player : MonoBehaviour
         {
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter)){
                 // Has Clear counter component | TryGetComponent handles null check
-                // clearCounter.Interact();
+                if(clearCounter != selectedCounter)
+                {
+                    SetSelectedCounter(clearCounter);
+                }
+            }
+            else
+            {
+                // If Raycast hit something and it donot have ClearCounter
+                SetSelectedCounter(null);
             }
         }
+        else
+        {
+            // If Raycast hit the null
+             SetSelectedCounter(null);
+        } 
     }
 
     // Handle the player movements
@@ -133,5 +154,16 @@ public class Player : MonoBehaviour
         float rotateSpeed = 10f;
         transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
 
+    }
+
+    private void SetSelectedCounter(ClearCounter selectedCounter)
+    {
+        this.selectedCounter = selectedCounter;
+
+        // When selectedCounter is changed execute this event
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
+        {
+            selectedCounter = selectedCounter
+        });
     }
 }
