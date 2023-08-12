@@ -195,6 +195,18 @@ Transform:
   - {fileID: 244815142}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 46, y: 0, z: 0}
+--- !u!114 &154338813 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3304598173037800757, guid: 523b0de02e777412482a60fab431e584,
+    type: 3}
+  m_PrefabInstance: {fileID: 2108998684}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52515ae76a7984ca0925dc10b16040fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &244815141
 GameObject:
   m_ObjectHideFlags: 3
@@ -1060,10 +1072,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3304598173037800757, guid: 523b0de02e777412482a60fab431e584,
         type: 3}
+      propertyPath: testing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3304598173037800757, guid: 523b0de02e777412482a60fab431e584,
+        type: 3}
       propertyPath: kitchenObjectSO
       value: 
       objectReference: {fileID: 11400000, guid: cf711348f748144958d0397c66d52223,
         type: 2}
+    - target: {fileID: 3304598173037800757, guid: 523b0de02e777412482a60fab431e584,
+        type: 3}
+      propertyPath: secondClearCounter
+      value: 
+      objectReference: {fileID: 154338813}
     - target: {fileID: 6000515922680981063, guid: 523b0de02e777412482a60fab431e584,
         type: 3}
       propertyPath: m_Name
