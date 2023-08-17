@@ -17,6 +17,15 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
         Debug.LogError("BaseCounter.Interact()");
     }
 
+    public virtual void InteractAlternate(Player player)
+    {
+        // virtual keyword use to implement this function in child classes in their own way
+        // Also can use abstract keyword and change it as abstract function
+        // Protected accessible can be used so child classes can access. But here this need to access by player, So make it as public
+        // This should never run
+        Debug.LogError("BaseCounter.InteractAlternate()");
+    }
+
     public Transform GetKitchenObjectFollowTransform()
     {
         return counterTopPoint;
