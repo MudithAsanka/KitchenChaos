@@ -1562,6 +1562,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 408c2c81352bc477b92578aacb2d5bb6,
         type: 2}
+    - target: {fileID: 1898730527773889406, guid: 46e1a86f577374cfbbc0c2ccbe842e5d,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1898730527773889406, guid: 46e1a86f577374cfbbc0c2ccbe842e5d,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 5b075b788c2f4498886b9bb34c0ed0dc,
+        type: 2}
+    - target: {fileID: 1898730527773889406, guid: 46e1a86f577374cfbbc0c2ccbe842e5d,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1e37c8ac542ee40a8be58acdaf0ce750,
+        type: 2}
+    - target: {fileID: 1898730527773889406, guid: 46e1a86f577374cfbbc0c2ccbe842e5d,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 33d93089d41bc4e8596503918589e16c,
+        type: 2}
     - target: {fileID: 2435281909468974448, guid: 46e1a86f577374cfbbc0c2ccbe842e5d,
         type: 3}
       propertyPath: m_LocalPosition.x
