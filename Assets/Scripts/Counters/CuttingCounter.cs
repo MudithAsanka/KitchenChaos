@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class CuttingCounter : BaseCounter, IHasProgress
 {
+    public static event EventHandler OnAnyCut;
+    // There are multiple cutting counters, if any of them OnCut event executes this executes,
+    // So there won't be necessary to subscribe for each cutting instance
+
     // IHasProgress.OnProgressChangedEventArgs -> Because need to use that exact type reference
     public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
     public event EventHandler OnCut;
@@ -73,6 +77,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
             cuttingProgress++;
 
             OnCut?.Invoke(this, EventArgs.Empty);   // Cutting Animation Event
+            OnAnyCut?.Invoke(this, EventArgs.Empty);    // Cutting Sound Event
 
             CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
 
