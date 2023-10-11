@@ -48,6 +48,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
     {
+        // If game is not in the GamePlaying State this will return without going furthur
+        if (!KitchenGameManager.Instance.IsGamePlaying()) return;
+
         if (selectedCounter != null)
         {
             selectedCounter.InteractAlternate(this);
@@ -56,7 +59,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-        if(selectedCounter != null)
+        // If game is not in the GamePlaying State this will return without going furthur
+        if (!KitchenGameManager.Instance.IsGamePlaying()) return;
+
+        if (selectedCounter != null)
         {
             selectedCounter.Interact(this);
         }
