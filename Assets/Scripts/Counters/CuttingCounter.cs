@@ -9,6 +9,14 @@ public class CuttingCounter : BaseCounter, IHasProgress
     // There are multiple cutting counters, if any of them OnCut event executes this executes,
     // So there won't be necessary to subscribe for each cutting instance
 
+    // 'CuttingCounter.ResetStaticData()' hides inherited member 'BaseCounter.ResetStaticData()'.
+    // Use the new keyword if hiding was intended.
+    new public static void ResetStaticData()
+    {
+        // Clear the listeners
+        OnAnyCut = null;
+    }
+
     // IHasProgress.OnProgressChangedEventArgs -> Because need to use that exact type reference
     public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
     public event EventHandler OnCut;

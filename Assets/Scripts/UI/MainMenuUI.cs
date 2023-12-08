@@ -20,5 +20,8 @@ public class MainMenuUI : MonoBehaviour
         {
             Application.Quit();
         });
+
+        // When game paused timescale = 0f, so it need to reset
+        Time.timeScale = 1f;
     }
 }
