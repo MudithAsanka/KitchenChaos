@@ -137,7 +137,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             // Attempt only X movement
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized; // normalized because diaganal speed need to normalized
             // moveDir.x != 0 -> Able to rotate when near the counter
-            canMove = moveDir.x != 0 && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
+            // For diaganal movement on gamepads need to consider here. for keyboards moveDir.x != 0 is fine
+            canMove = (moveDir.x < -0.5f || moveDir.x > 0.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
 
             if (canMove)
             {
@@ -151,7 +152,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
                 // Attempt only Z movement
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized; // normalized because diaganal speed need to normalized
                 // moveDir.z != 0 -> Able to rotate when near the counter
-                canMove = moveDir.z != 0 && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
+                // For diaganal movement on gamepads need to consider here. for keyboards moveDir.z != 0 is fine
+                canMove = (moveDir.z < -0.5f || moveDir.z > 0.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
 
                 if (canMove)
                 {
