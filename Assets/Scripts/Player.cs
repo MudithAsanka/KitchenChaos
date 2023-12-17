@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
 
-    public static Player Instance { get; private set; }     // This is a property; only set in this class, can acesess from any class
+    //public static Player Instance { get; private set; }     // This is a property; only set in this class, can acesess from any class
 
     public event EventHandler OnPickedSomething;
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
@@ -17,7 +17,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     }
 
     [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask countersLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
 
@@ -29,21 +28,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void Awake()
     {
-        /* Singleton pattern has only one instance of something.
-         * In this case we should never have that more than one player
-         * So, do safety check by checking is this instance already set to one instance
-        */
-        if(Instance != null)
-        {
-            Debug.LogError("There are more than one Player instance");
-        }
-        Instance = this;
+        //Instance = this;
     }
 
     private void Start()
     {
-        gameInput.OnInteractAction += GameInput_OnInteractAction;
-        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+        GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -70,6 +61,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void Update()
     {
+        // If this is not localplayer, It will not execute and just return, If it is localplayer continue
+        if (!IsOwner)
+        {
+            return;
+        }
         HandleMovement();
         HandleInteractions();
     }
@@ -83,7 +79,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     // Handle the player interactions
     private void HandleInteractions()
     {
-        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
 
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 
@@ -120,7 +116,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     // Handle the player movements
     private void HandleMovement()
     {
-        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
 
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 
