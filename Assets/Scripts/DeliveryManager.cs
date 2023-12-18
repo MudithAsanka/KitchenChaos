@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class DeliveryManager : MonoBehaviour
+public class DeliveryManager : NetworkBehaviour
 {
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
@@ -15,7 +16,7 @@ public class DeliveryManager : MonoBehaviour
     [SerializeField] private RecipeListSO recipeListSO;
 
     private List<RecipeSO> waitingRecipeSOList;
-    private float spawnRecipeTimer;
+    private float spawnRecipeTimer = 4f;
     private float spawnRecipeTimerMax = 4f;
     private int waitingRecipesMax = 4;
     private int successfulRecipesAmount;
@@ -29,6 +30,12 @@ public class DeliveryManager : MonoBehaviour
 
     private void Update()
     {
+        // Allow the only network to spawn the recipies
+        if (!IsServer)
+        {
+            return;
+        }
+
         spawnRecipeTimer -= Time.deltaTime; 
         if(spawnRecipeTimer <= 0f)
         {
@@ -37,13 +44,23 @@ public class DeliveryManager : MonoBehaviour
             // KitchenGameManager.Instance.IsGamePlaying() ? (True) Now it can show the recipies
             if (KitchenGameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitingRecipesMax)
             {
-                RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
+                int waitingRecipeSOIndex = UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count);
                 
-                waitingRecipeSOList.Add(waitingRecipeSO);
-
-                OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+                SpawnNewWaitingRecipeClientRpc(waitingRecipeSOIndex);
             }
         }
+    }
+
+    [ClientRpc]
+    private void SpawnNewWaitingRecipeClientRpc(int waitingRecipeSOIndex)
+    {
+        // After server generate a recipe, Inform clients this specific recipe has been generated
+
+        RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[waitingRecipeSOIndex];
+        waitingRecipeSOList.Add(waitingRecipeSO);
+
+        OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+
     }
 
     public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
@@ -82,10 +99,8 @@ public class DeliveryManager : MonoBehaviour
                     // Player delivered the correct Recipe!
                     successfulRecipesAmount++;
 
-                    waitingRecipeSOList.RemoveAt(i);
-
-                    OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
-                    OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+                    // Client run the code and inform server whether it is correct or incorrect and broadcast to clients 
+                    DeliverCorrectRecipeServerRpc(i);
 
                     return;
                 }
@@ -94,6 +109,39 @@ public class DeliveryManager : MonoBehaviour
 
         // No matches found
         // Player did not deliver a correct Recipe
+        // Client run the code and inform server whether it is correct or incorrect and broadcast to clients
+        DeliverIncorrectRecipeServerRpc();
+    }
+
+    // (RequireOwnership = false)
+    // Since DeliveryManager belongs to server and not Client that means only server can trigger ther ServerRpc
+    // (RequireOwnership = false) - ServerRpc no longer require ownership
+    // This means client that doesnot own networkobject will be able to trigger this ServerRpc
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverCorrectRecipeServerRpc(int waitingRecipeSOListIndex)
+    {
+        DeliverCorrectRecipeClientRpc(waitingRecipeSOListIndex);
+    }
+
+    [ClientRpc]
+    private void DeliverCorrectRecipeClientRpc(int waitingRecipeSOListIndex)
+    {
+        waitingRecipeSOList.RemoveAt(waitingRecipeSOListIndex);
+
+        OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+        OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverIncorrectRecipeServerRpc()
+    {
+        DeliverIncorrectRecipeClientRpc();
+    }
+
+    [ClientRpc]
+    private void DeliverIncorrectRecipeClientRpc()
+    {
         OnRecipeFailed?.Invoke(this, EventArgs.Empty);
     }
 
