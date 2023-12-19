@@ -9,7 +9,27 @@ public class SelectedCounterVisual : MonoBehaviour
 
     private void Start()
     {
-        //Player.Instance.OnSelectedCounterChanged += Player_OnSelectedCounterChanged;
+        // Start may not be player instance so listen to the OnAnyPlayerSpawned event
+        if(Player.LocalInstance != null)
+        {
+            Player.LocalInstance.OnSelectedCounterChanged += Player_OnSelectedCounterChanged;
+        }
+        else
+        {
+            Player.OnAnyPlayerSpawned += Player_OnAnyPlayerSpawned;
+        }
+    }
+
+    private void Player_OnAnyPlayerSpawned(object sender, System.EventArgs e)
+    {
+        if(Player.LocalInstance != null)
+        {
+            // This event will execute multiple times for multiple players
+            // So if the first one were the LocalInstance and we could end up with multiple listeners which would cause duplicate logic
+            // So make sure to not to happen first unsubscribe and then subscribe
+            Player.LocalInstance.OnSelectedCounterChanged -= Player_OnSelectedCounterChanged;
+            Player.LocalInstance.OnSelectedCounterChanged += Player_OnSelectedCounterChanged;
+        }
     }
 
     private void Player_OnSelectedCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs e)

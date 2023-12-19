@@ -7,7 +7,16 @@ using UnityEngine;
 public class Player : NetworkBehaviour, IKitchenObjectParent
 {
 
-    //public static Player Instance { get; private set; }     // This is a property; only set in this class, can acesess from any class
+    public static event EventHandler OnAnyPlayerSpawned;    // static because we want this event belong to the player class itself not any specific player  
+    public static event EventHandler OnAnyPickedSomething;
+
+    public static void ResetStaticData()
+    {
+        // Clear the listeners
+        OnAnyPlayerSpawned = null;
+    }
+
+    public static Player LocalInstance { get; private set; }     // This is a property; only set in this class, can acesess from any class
 
     public event EventHandler OnPickedSomething;
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
@@ -35,6 +44,17 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+    }
+
+    // When gameobject spawn on network
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            // If this is local player
+            LocalInstance = this;
+        }
+        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -198,6 +218,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         if(kitchenObject != null)
         {
             OnPickedSomething?.Invoke(this, EventArgs.Empty);   // If kitchenObject is pickedup play sound
+            OnAnyPickedSomething?.Invoke(this, EventArgs.Empty);
         }
     }
 
