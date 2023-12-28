@@ -15,8 +15,12 @@ public class PlateKitchenObject : KitchenObject
     
     private List<KitchenObjectSO> kitchenObjectSOList;
 
-    private void Awake()
+    // PlateKitchenObject Awake() skip the KitchenObject Awake()
+    // So, protected override, KitchenObject protected virtual; this will override the parent object Awake()
+    // But still want to run the parent object Awake(), therfore base.Awake();
+    protected override void Awake()
     {
+        base.Awake();
         kitchenObjectSOList = new List<KitchenObjectSO>();
     }
 
