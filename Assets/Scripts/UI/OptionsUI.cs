@@ -73,7 +73,7 @@ public class OptionsUI : MonoBehaviour
     private void Start()
     {
         // Make press "Escape" hide the option UI
-        KitchenGameManager.Instance.OnGameUnpaused += KitchenGameManager_OnGameUnpaused;
+        KitchenGameManager.Instance.OnLocalGameUnpaused += KitchenGameManager_OnGameUnpaused;
 
         UpdateVisual();
 
