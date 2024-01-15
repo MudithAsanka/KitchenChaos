@@ -60,6 +60,23 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         transform.position = spawnPositionList[(int)OwnerClientId]; // Spawn Players with different location offsets
 
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
+
+        // Handle players disconnect - this is only require for server
+        // In here IsServer is refers to state of this build not this specific player
+        // Also this will still attached to server-side eventhough players are not actually the host
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+        }
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+    {
+        // If this disconnected player has kitchenobject need to destroy
+        if(clientId == OwnerClientId && HasKitchenObject())
+        {
+            KitchenObject.DestroyKitchenObject(GetKitchenObject());
+        }
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)

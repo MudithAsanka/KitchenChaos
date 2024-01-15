@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using UnityEngine.UI;
 
 public class GamePauseUI : MonoBehaviour
@@ -18,6 +19,8 @@ public class GamePauseUI : MonoBehaviour
 
         mainMenuButton.onClick.AddListener(() =>
         {
+            // When go to MainMenu, NetworkManager need to shutdown otherwise connection will be there
+            NetworkManager.Singleton.Shutdown();
             Loader.Load(Loader.Scene.MainMenuScene);
         });
 
