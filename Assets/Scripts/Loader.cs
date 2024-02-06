@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,7 +10,9 @@ public static class Loader
     {
         MainMenuScene,
         GameScene,
-        LoadingScene
+        LoadingScene,
+        LobbyScene,
+        CharacterSelectScene
     }
 
     public static Scene targetScene;
@@ -19,6 +22,13 @@ public static class Loader
         Loader.targetScene = targetScene;
 
         SceneManager.LoadScene(Scene.LoadingScene.ToString());
+    }
+
+    // In order to load through NetworkManager
+    public static void LoadNetwork(Scene targetScene)
+    {
+        // If we donot load through NetworkManager, objects of new scene will not automatically spawn
+        NetworkManager.Singleton.SceneManager.LoadScene(targetScene.ToString(), LoadSceneMode.Single);
     }
 
     public static void LoaderCallback()
